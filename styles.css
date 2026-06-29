@@ -411,7 +411,29 @@ main{position:relative; z-index:1; max-width:1000px; margin:0 auto; padding:clam
 .hero-rune svg{width:13px; height:17px; display:block}
 
 html{overflow-x:hidden}
-.ytplayer{position:fixed; right:0; bottom:0; width:2px; height:2px; opacity:0; pointer-events:none; z-index:-5}
+
+/* v5 — Sprint: barra doble por tomo, cuenta regresiva, meta diaria */
+.deck-bar{position:relative; height:9px}
+.deck-seen{position:absolute; left:0; top:0; height:100%; width:0%; border-radius:20px;
+  background:linear-gradient(90deg,var(--aurora-2),var(--aurora-1)); opacity:.5; transition:width .5s}
+.deck-fill{position:absolute; left:0; top:0; height:100%; width:0%; border-radius:20px;
+  background:linear-gradient(90deg,var(--gold-soft),var(--gold)); box-shadow:0 0 8px rgba(212,175,55,.5); transition:width .5s}
+
+.tomos-head{display:flex; align-items:baseline; justify-content:space-between; gap:10px; flex-wrap:wrap; margin:6px 0 14px}
+.tomos-head .section-title{margin:0}
+.bar-legend{font-family:var(--font-body); font-size:.72rem; color:var(--muted); display:flex; align-items:center; gap:5px}
+.bar-legend i{display:inline-block; width:14px; height:8px; border-radius:4px}
+.lg-seen{background:linear-gradient(90deg,var(--aurora-2),var(--aurora-1)); opacity:.6}
+.lg-mast{background:linear-gradient(90deg,var(--gold-soft),var(--gold)); margin-left:8px}
+
+.sprint-row{display:flex; gap:16px; border-top:1px solid var(--line); padding-top:14px; flex-wrap:wrap}
+.sprint-cell{flex:1; min-width:150px; display:flex; flex-direction:column; gap:3px}
+.sc-label{font-family:var(--font-body); font-size:.6rem; letter-spacing:.16em; color:var(--muted)}
+.sc-val{font-family:var(--font-display); font-size:1.02rem; color:var(--frost)}
+.sc-val.urgent{color:var(--ember)}
+.sc-daily .sc-val b{color:var(--gold)}
+.daily-bar{height:8px; background:rgba(255,255,255,.08); border:1px solid var(--line); border-radius:20px; overflow:hidden; margin-top:4px}
+.daily-fill{height:100%; width:0%; border-radius:20px; background:linear-gradient(90deg,var(--gold-soft),var(--gold)); transition:width .5s}
 
 /* ============================================================
    ACCESIBILIDAD: menos movimiento

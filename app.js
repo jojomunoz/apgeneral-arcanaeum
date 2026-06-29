@@ -39,6 +39,9 @@
   function toast(m) { var t = $("toast"); t.textContent = m; t.classList.add("show"); clearTimeout(t._t); t._t = setTimeout(function () { t.classList.remove("show"); }, 2600); }
   function deckById(num) { for (var i = 0; i < window.DECKS.length; i++) if (window.DECKS[i].num === num) return window.DECKS[i]; return null; }
   function mode() { return SRS.getSettings().mode; }
+  var MONTHS = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
+  function daysUntil(dateStr) { var ex = new Date(dateStr + "T23:59:59"); return Math.ceil((ex - new Date()) / 86400000); }
+  function fmtDate(dateStr) { var p = dateStr.split("-"); return parseInt(p[2], 10) + " " + (MONTHS[parseInt(p[1], 10) - 1] || ""); }
 
   // ---- música: archivo local (mix ambiental medieval, sin copyright) ----
   var music = null;
@@ -115,19 +118,32 @@
       ? "Tienes " + g.due + " carta(s) para repasar hoy (de todos los temas)."
       : "Sin pendientes por hoy: te dará cartas nuevas para aprender.";
 
+    // ---- Sprint: cuenta regresiva al examen + meta diaria ----
+    var exam = SRS.getSettings().examDate, dleft = daysUntil(exam), cd = $("exam-countdown");
+    if (dleft > 1) cd.textContent = "faltan " + dleft + " días · " + fmtDate(exam);
+    else if (dleft === 1) cd.textContent = "¡mañana! · " + fmtDate(exam);
+    else if (dleft === 0) cd.textContent = "¡es hoy! · " + fmtDate(exam);
+    else cd.textContent = "ya pasó · " + fmtDate(exam);
+    cd.classList.toggle("urgent", dleft <= 2);
+    var finishDays = Math.max(1, dleft - 1), quota = g.newCount > 0 ? Math.max(1, Math.ceil(g.newCount / finishDays)) : 0;
+    var doneNew = SRS.today().newToday;
+    if (g.newCount === 0) { $("daily-text").textContent = "✓ todo estudiado — ¡a dominar!"; $("daily-fill").style.width = "100%"; }
+    else { $("daily-text").innerHTML = "<b>" + doneNew + "</b> / " + quota + " nuevas"; $("daily-fill").style.width = Math.min(100, Math.round(doneNew / quota * 100)) + "%"; }
+
     renderWordWall();
 
     var grid = $("deck-grid"); grid.innerHTML = "";
     window.DECKS.forEach(function (dk) {
       var s = SRS.deckStats(dk.num);
       var statusLbl = { locked: "Sin empezar", progress: "En progreso", solid: "Sólido", mastered: "Dominado" }[s.status];
+      var seenPct = s.total ? Math.round(s.seen / s.total * 100) : 0;
       var el = document.createElement("button");
       el.type = "button"; el.className = "deck";
       el.innerHTML =
         "<div class='deck-rune'>" + runeSvg(dk.code) + "</div>" +
         "<div class='deck-name'>" + esc(dk.nameEs) + "</div>" +
         "<div class='deck-en'>" + esc(dk.nameEn) + "</div>" +
-        "<div class='deck-bar'><div class='deck-fill' style='width:" + s.pct + "%'></div></div>" +
+        "<div class='deck-bar'><div class='deck-seen' style='width:" + seenPct + "%'></div><div class='deck-fill' style='width:" + s.pct + "%'></div></div>" +
         "<div class='deck-meta'><span class='deck-status st-" + s.status + "'>" + statusLbl + " · " + s.pct + "%</span>" +
         "<span class='deck-due'>" + (s.due ? s.due + " ⏳" : (s.new ? s.new + " nuevas" : "✓")) + "</span></div>";
       el.addEventListener("click", function () { gesture(); startSession(dk.num); });

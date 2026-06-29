@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Grenze+Gotisch:wght@500;700;900&family=EB+Garamond:ital@0;1&family=Noto+Sans+Runic&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="styles.css?v=4" />
+<link rel="stylesheet" href="styles.css?v=5" />
 </head>
 <body>
 
@@ -88,6 +88,17 @@
           </div>
         </div>
       </div>
+      <div class="sprint-row">
+        <div class="sprint-cell">
+          <span class="sc-label">⏳ EXAMEN</span>
+          <span class="sc-val" id="exam-countdown">—</span>
+        </div>
+        <div class="sprint-cell sc-daily">
+          <span class="sc-label">🎯 META DE HOY</span>
+          <span class="sc-val" id="daily-text">0/0</span>
+          <div class="daily-bar"><div id="daily-fill" class="daily-fill"></div></div>
+        </div>
+      </div>
       <div class="wordwall-wrap">
         <div class="wordwall-head">
           <span class="ww-title">⟁ Muro de Palabras de Poder</span>
@@ -113,7 +124,10 @@
       </div>
     </div>
 
-    <h3 class="section-title">📜 Tomos de Conocimiento</h3>
+    <div class="tomos-head">
+      <h3 class="section-title">📜 Tomos de Conocimiento</h3>
+      <span class="bar-legend"><i class="lg-seen"></i>Estudiado<i class="lg-mast"></i>Dominado</span>
+    </div>
     <div id="deck-grid" class="deck-grid"></div>
 
     <div class="save-row card-panel">
@@ -181,9 +195,9 @@
 
 </main>
 
-<script src="data/cards.js?v=4"></script>
-<script src="srs.js?v=4"></script>
-<script src="audio.js?v=4"></script>
-<script src="app.js?v=4"></script>
+<script src="data/cards.js?v=5"></script>
+<script src="srs.js?v=5"></script>
+<script src="audio.js?v=5"></script>
+<script src="app.js?v=5"></script>
 </body>
 </html>

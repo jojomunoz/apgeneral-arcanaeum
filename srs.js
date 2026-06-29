@@ -6,18 +6,18 @@ window.SRS = (function () {
   "use strict";
   var KEY = "arcanaeum_v1";
   var DAY = 86400000;
-  var MASTER_INTERVAL = 7;   // días de intervalo para contar "dominada"
-  var NEW_PER_SESSION = 20;  // cartas nuevas por sesión
-  var MAX_SESSION = 40;      // tope de cartas por sesión
+  var MASTER_REPS = 2;       // recuerdos correctos para contar "dominada" (modo Sprint)
+  var NEW_PER_SESSION = 25;  // cartas nuevas por sesión
+  var MAX_SESSION = 50;      // tope de cartas por sesión
   var READY_GLOBAL = 85;     // % global para "listo"
   var READY_DECK = 70;       // % mínimo por mazo
 
   function fresh() {
     return {
-      v: 1,
-      cards: {},  // id -> {reps, ease, intervalDays, due, lastGrade, seen}
-      stats: { xp: 0, level: 1, streak: 0, lastDay: null, days: [], reviews: 0 },
-      settings: { mode: "mc", muted: false }
+      v: 2,
+      cards: {},  // id -> {reps, intervalDays, due, lastGrade, seen}
+      stats: { xp: 0, level: 1, streak: 0, lastDay: null, days: [], reviews: 0, todayDate: null, newToday: 0, reviewToday: 0 },
+      settings: { mode: "mc", muted: false, examDate: "2026-07-09" }
     };
   }
   var state = load();
@@ -27,7 +27,9 @@ window.SRS = (function () {
       var s = JSON.parse(localStorage.getItem(KEY));
       if (s && s.cards) {
         if (!s.settings) s.settings = fresh().settings;
+        if (!s.settings.examDate) s.settings.examDate = "2026-07-09";
         if (!s.stats) s.stats = fresh().stats;
+        if (s.stats.newToday == null) { s.stats.newToday = 0; s.stats.reviewToday = 0; s.stats.todayDate = null; }
         return s;
       }
     } catch (e) {}
@@ -38,7 +40,7 @@ window.SRS = (function () {
   function todayStr() { var d = new Date(); return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate(); }
   function cs(id) { return state.cards[id]; }
 
-  function isMastered(id) { var c = cs(id); return !!(c && c.intervalDays >= MASTER_INTERVAL && c.lastGrade !== "again"); }
+  function isMastered(id) { var c = cs(id); return !!(c && c.reps >= MASTER_REPS && c.lastGrade !== "again"); }
   function isDue(id) { var c = cs(id); return !!(c && c.due <= now()); }
   function isNew(id) { return !cs(id); }
 
@@ -55,21 +57,25 @@ window.SRS = (function () {
   }
 
   function grade(id, rating) {
-    var c = cs(id) || { reps: 0, ease: 2.3, intervalDays: 0, due: now(), lastGrade: null, seen: 0 };
+    var wasNew = !cs(id);
+    var c = cs(id) || { reps: 0, intervalDays: 0, due: now(), lastGrade: null, seen: 0 };
     var wasMastered = isMastered(id);
     c.seen++; state.stats.reviews++;
     var xp = 4;
+    // intervalos comprimidos (modo Sprint): las cartas vuelven en horas / al día siguiente
     if (rating === "again") {
-      c.reps = 0; c.intervalDays = 0; c.ease = Math.max(1.3, c.ease - 0.2); c.due = now();
+      c.reps = 0; c.intervalDays = 0; c.due = now();                       // vuelve en esta sesión
     } else if (rating === "ok") {
-      c.intervalDays = c.reps === 0 ? 1 : Math.max(1, Math.round(c.intervalDays * 1.25));
-      c.ease = Math.max(1.3, c.ease - 0.05); c.reps++; c.due = now() + c.intervalDays * DAY; xp = 6;
+      c.reps++; c.intervalDays = 0.25; c.due = now() + 0.25 * DAY; xp = 6;  // ~6 h después
     } else { // good
-      c.intervalDays = c.reps === 0 ? 1 : (c.reps === 1 ? 3 : Math.round(c.intervalDays * c.ease));
-      c.ease = Math.min(2.8, c.ease + 0.05); c.reps++; c.due = now() + c.intervalDays * DAY; xp = 10;
+      c.reps++; c.intervalDays = c.reps < 2 ? 0.6 : 1; c.due = now() + c.intervalDays * DAY; xp = 10; // ~mañana
     }
     c.lastGrade = rating;
     state.cards[id] = c;
+    // conteo del día (para la meta diaria)
+    var t = todayStr();
+    if (state.stats.todayDate !== t) { state.stats.todayDate = t; state.stats.newToday = 0; state.stats.reviewToday = 0; }
+    if (wasNew) state.stats.newToday++; else state.stats.reviewToday++;
     var newlyMastered = false;
     if (!wasMastered && isMastered(id)) { xp += 25; newlyMastered = true; }
     state.stats.xp += xp;
@@ -114,8 +120,17 @@ window.SRS = (function () {
     var decksDone = decks.filter(function (d) { return d.s.pct >= READY_DECK; }).length;
     var weak = decks.filter(function (d) { return d.s.pct < READY_DECK; });
     var ready = pct >= READY_GLOBAL && weak.length === 0;
+    var newCount = window.CARDS.filter(function (c) { return isNew(c.id); }).length;
+    var seen = window.CARDS.filter(function (c) { return !!cs(c.id); }).length;
     return { total: total, mastered: mastered, due: due, pct: pct, decksDone: decksDone, ready: ready, weak: weak,
+             newCount: newCount, seen: seen, seenPct: total ? Math.round(seen / total * 100) : 0,
              readyGlobal: READY_GLOBAL, readyDeck: READY_DECK };
+  }
+
+  function today() {
+    var t = todayStr();
+    if (state.stats.todayDate !== t) return { newToday: 0, reviewToday: 0 };
+    return { newToday: state.stats.newToday || 0, reviewToday: state.stats.reviewToday || 0 };
   }
 
   function exportData() { return JSON.stringify(state, null, 1); }
@@ -138,6 +153,7 @@ window.SRS = (function () {
     getSettings: function () { return state.settings; },
     setSetting: function (k, v) { state.settings[k] = v; save(); },
     getStats: function () { return state.stats; },
+    today: today,
     levelFor: levelFor, xpForLevel: xpForLevel
   };
 })();
