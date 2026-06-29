@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Grenze+Gotisch:wght@500;700;900&family=EB+Garamond:ital@0;1&family=Noto+Sans+Runic&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="styles.css?v=6" />
+<link rel="stylesheet" href="styles.css?v=7" />
 </head>
 <body>
 
@@ -49,6 +49,7 @@
 <!-- ===== OVERLAYS ===== -->
 <div id="levelup" class="levelup" aria-hidden="true"><div class="lu-inner"><span id="lu-title">HABILIDAD AUMENTADA</span><span id="lu-sub"></span></div></div>
 <div id="toast" class="toast" aria-live="polite"></div>
+<div id="motd" class="motd" aria-hidden="true"><span id="motd-text"></span></div>
 
 <!-- ===== TOP BAR ===== -->
 <header id="topbar">
@@ -125,6 +126,8 @@
       </div>
     </div>
 
+    <button id="examBtn" class="epic-btn exam-cta" type="button">🛡️ HACER EXAMEN DE PRÁCTICA<span class="exam-cta-sub">40 preguntas al azar · 90% para aprobar</span></button>
+
     <div class="tomos-head">
       <h3 class="section-title">📜 Tomos de Conocimiento</h3>
       <span class="bar-legend"><i class="lg-seen"></i>Estudiado<i class="lg-mast"></i>Dominado</span>
@@ -194,11 +197,46 @@
     </div>
   </section>
 
+  <!-- ============================================================ -->
+  <!-- EXAMEN DE PRÁCTICA -->
+  <!-- ============================================================ -->
+  <section id="screen-exam" class="screen" aria-label="Examen de práctica">
+    <div class="study-top">
+      <button id="exitExam" class="ghost-btn small" type="button">‹ Salir</button>
+      <span class="study-deck">🛡️ Examen de práctica</span>
+      <span id="exam-progress" class="study-progress">0/40</span>
+    </div>
+    <div id="exam-bar" class="sbar"><div id="exam-bfill" class="sfill"></div></div>
+    <div id="exam-card" class="scroll-card">
+      <span class="card-tag">EXAMEN</span>
+      <figure id="exam-figure" class="card-figure" hidden><img id="exam-img" alt="Figura de referencia" src="data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='1'%20height='1'/%3E" /></figure>
+      <div id="exam-question" class="card-question">…</div>
+      <div id="exam-options" class="card-options"></div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- RESULTADO DEL EXAMEN -->
+  <!-- ============================================================ -->
+  <section id="screen-examres" class="screen" aria-label="Resultado del examen">
+    <div class="summary-inner card-panel">
+      <h1 id="exam-banner" class="summary-title">…</h1>
+      <p id="exam-score-sub" class="summary-flavor">…</p>
+      <div id="exam-stats" class="summary-stats"></div>
+      <h3 class="exam-review-title">📋 Repaso de fallos</h3>
+      <div id="exam-review" class="exam-review"></div>
+      <div class="summary-actions">
+        <button id="examRetry" class="epic-btn" type="button">🔁 Otro examen</button>
+        <button id="examMenu" class="ghost-btn" type="button">🏔️ Volver al menú</button>
+      </div>
+    </div>
+  </section>
+
 </main>
 
-<script src="data/cards.js?v=6"></script>
-<script src="srs.js?v=6"></script>
-<script src="audio.js?v=6"></script>
-<script src="app.js?v=6"></script>
+<script src="data/cards.js?v=7"></script>
+<script src="srs.js?v=7"></script>
+<script src="audio.js?v=7"></script>
+<script src="app.js?v=7"></script>
 </body>
 </html>

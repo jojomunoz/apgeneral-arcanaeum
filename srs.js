@@ -11,6 +11,7 @@ window.SRS = (function () {
   var MAX_SESSION = 50;      // tope de cartas por sesión
   var READY_GLOBAL = 85;     // % global para "listo"
   var READY_DECK = 70;       // % mínimo por mazo
+  var READY_BUFFER = 2;      // apuntar a estar listo N días ANTES del examen
 
   function fresh() {
     return {
@@ -147,15 +148,17 @@ window.SRS = (function () {
   function daysToExam() { return Math.ceil((new Date(state.settings.examDate + "T23:59:59") - new Date()) / 86400000); }
   function plan() {
     var dleft = daysToExam();
-    var finishDays = Math.max(1, dleft - 1);              // margen de 1 día antes del examen
+    var finishDays = Math.max(1, dleft - READY_BUFFER);              // margen de 1 día antes del examen
     var rem = remainingTouches();
     var required = rem > 0 ? Math.max(1, Math.ceil(rem / finishDays)) : 0;
     var t = today(); var done = t.newToday + t.reviewToday;
     var studyDays = Math.max(1, (state.stats.days || []).length);
     var avg = Math.round(state.stats.reviews / studyDays);
     var projDays = avg > 0 ? Math.ceil(rem / avg) : null; // a tu ritmo promedio, cuántos días faltan
-    var onPace = done >= required || (projDays !== null && projDays <= Math.max(1, dleft));
-    return { daysLeft: dleft, required: required, done: done, remaining: rem, avg: avg, projDays: projDays, onPace: onPace };
+    var onPace = done >= required || (projDays !== null && projDays <= finishDays);
+    var rb = new Date(new Date(state.settings.examDate + "T23:59:59").getTime() - READY_BUFFER * DAY);
+    var readyBy = rb.getFullYear() + "-" + (rb.getMonth() + 1) + "-" + rb.getDate();
+    return { daysLeft: dleft, required: required, done: done, remaining: rem, avg: avg, projDays: projDays, onPace: onPace, buffer: READY_BUFFER, readyBy: readyBy };
   }
 
   function exportData() { return JSON.stringify(state, null, 1); }

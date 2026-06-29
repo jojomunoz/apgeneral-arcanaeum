@@ -437,6 +437,33 @@ html{overflow-x:hidden}
 .pace-line{flex-basis:100%; font-family:var(--font-flavor); font-style:italic; color:var(--muted); font-size:.86rem; margin-top:4px}
 .pace-line b{color:var(--gold); font-style:normal}
 
+/* frase motivacional al iniciar sesión */
+.motd{position:fixed; top:64px; left:50%; transform:translateX(-50%) translateY(-12px); z-index:85; pointer-events:none;
+  max-width:min(680px,92vw); text-align:center; opacity:0; font-family:var(--font-flavor); font-style:italic; color:#241a06;
+  background:linear-gradient(180deg,#efe6d0,var(--parch-2)); border:1px solid #8a6d18; border-radius:12px;
+  padding:10px 22px; font-size:clamp(.95rem,2.6vw,1.18rem); box-shadow:0 8px 30px rgba(0,0,0,.5)}
+.motd.go{animation:motdShow 3.8s ease both}
+@keyframes motdShow{0%{opacity:0;transform:translateX(-50%) translateY(-12px)}12%{opacity:1;transform:translateX(-50%) translateY(0)}82%{opacity:1;transform:translateX(-50%) translateY(0)}100%{opacity:0;transform:translateX(-50%) translateY(-12px)}}
+
+/* CTA examen de práctica */
+.exam-cta{display:flex; flex-direction:column; align-items:center; gap:2px; width:100%; margin:0 0 22px;
+  background:linear-gradient(180deg,#b56bff,#7b2bff); color:#fff; box-shadow:0 4px 0 #4a1a99,0 8px 22px rgba(123,43,255,.35)}
+.exam-cta:active{box-shadow:0 1px 0 #4a1a99}
+.exam-cta-sub{font-family:var(--font-body); font-weight:400; font-size:.72rem; opacity:.92; letter-spacing:.02em}
+
+/* barra de progreso del examen */
+.sbar{height:8px; background:rgba(255,255,255,.08); border:1px solid var(--line); border-radius:20px; overflow:hidden; margin-bottom:16px}
+.sfill{height:100%; width:0%; border-radius:20px; background:linear-gradient(90deg,#b56bff,#7b2bff); transition:width .35s}
+
+/* repaso de fallos del examen */
+.exam-review-title{font-family:var(--font-display); color:var(--amber); font-size:1rem; text-align:left; margin:6px 0 10px}
+.exam-review{display:flex; flex-direction:column; gap:10px; text-align:left; max-height:46vh; overflow-y:auto; padding-right:4px}
+.exrev{background:var(--stone-2); border:1px solid rgba(255,255,255,.1); border-left:4px solid var(--bad); border-radius:10px; padding:12px 14px}
+.exrev-q{font-family:var(--font-body); font-weight:700; font-size:.92rem; margin-bottom:6px; color:var(--ink); line-height:1.4}
+.exrev-bad{font-family:var(--font-body); font-size:.86rem; color:#ffb3ac; line-height:1.4}
+.exrev-good{font-family:var(--font-body); font-size:.86rem; color:#9dffc4; line-height:1.4; margin-top:2px}
+.exrev-exp{font-family:var(--font-body); font-size:.82rem; color:var(--muted); line-height:1.45; margin-top:6px; white-space:pre-wrap}
+
 /* ============================================================
    ACCESIBILIDAD: menos movimiento
    ============================================================ */

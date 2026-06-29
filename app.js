@@ -4,7 +4,7 @@
 (function () {
   "use strict";
   var $ = function (id) { return document.getElementById(id); };
-  var screens = { menu: $("screen-menu"), study: $("screen-study"), summary: $("screen-summary") };
+  var screens = { menu: $("screen-menu"), study: $("screen-study"), summary: $("screen-summary"), exam: $("screen-exam"), examres: $("screen-examres") };
 
   // nombre del usuario (Abdiel por defecto, override con ?name=)
   var NAME = "Abdiel";
@@ -42,6 +42,26 @@
   var MONTHS = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
   function daysUntil(dateStr) { var ex = new Date(dateStr + "T23:59:59"); return Math.ceil((ex - new Date()) / 86400000); }
   function fmtDate(dateStr) { var p = dateStr.split("-"); return parseInt(p[2], 10) + " " + (MONTHS[parseInt(p[1], 10) - 1] || ""); }
+  function shuffleArr(a) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+
+  var QUOTES = [
+    "“El que persevera alcanza la cima de la Garganta del Mundo.”",
+    "Fus… Ro… ¡DAH! Derriba este tema, {name}.",
+    "Faltan {days} días. Cada carta te acerca a la idoneidad.",
+    "Los Nords no nacen sabios — se forjan estudiando.",
+    "La disciplina de hoy es la victoria de mañana, {name}.",
+    "Ningún dragón cayó por suerte. A estudiar.",
+    "Enciende una runa más en tu Muro de Palabras.",
+    "El conocimiento es tu Thu’um. Hazte oír el día del examen.",
+    "By the gods, {name} — hoy dominas otro tomo.",
+    "{days} días para la gloria. Demuestra tu disciplina, {name}."
+  ];
+  function showMotd() {
+    var d = SRS.daysToExam();
+    var q = QUOTES[Math.floor(Math.random() * QUOTES.length)].replace(/\{name\}/g, NAME).replace(/\{days\}/g, d);
+    $("motd-text").textContent = q;
+    var el = $("motd"); el.classList.remove("go"); void el.offsetWidth; el.classList.add("go");
+  }
 
   // ---- música: archivo local (mix ambiental medieval, sin copyright) ----
   var music = null;
@@ -134,7 +154,7 @@
       $("daily-text").innerHTML = "<b>" + pl.done + "</b> / " + pl.required + " cartas";
       $("daily-fill").style.width = Math.min(100, Math.round(pl.done / pl.required * 100)) + "%";
       var badge = pl.done >= pl.required ? "✅ ¡meta de hoy cumplida!" : (pl.onPace ? "✅ vas al día" : "⚠️ subí el ritmo");
-      $("pace-note").innerHTML = "🏁 Necesitas ~<b>" + pl.required + "</b> cartas/día para dominar todo antes del " + fmtDate(exam) + " · " + badge;
+      $("pace-note").innerHTML = "🏁 ~<b>" + pl.required + "</b> cartas/día para dominar todo y estar listo el <b>" + fmtDate(pl.readyBy) + "</b> (" + pl.buffer + " días antes del examen) · " + badge;
     }
 
     renderWordWall();
@@ -165,7 +185,7 @@
     pos = 0; sess = { reviewed: 0, again: 0, ok: 0, good: 0, xp: 0, levelups: 0, mastered: 0, deck: deckNum };
     var dk = deckNum === "all" ? null : deckById(deckNum);
     $("study-deck").textContent = dk ? dk.nameEs : "⚔️ Repaso general";
-    show("study"); renderCard();
+    show("study"); showMotd(); renderCard();
   }
 
   function renderCard() {
@@ -295,6 +315,70 @@
   }
   function sumstat(e, v, l) { return "<div class='sumstat'><div class='v'>" + e + " " + esc(String(v)) + "</div><div class='l'>" + l + "</div></div>"; }
 
+  // ============================================================ EXAMEN DE PRÁCTICA
+  var EXAM_N = 40, EXAM_PASS = 90, exam = null;
+  function startExam() {
+    var pool = shuffleArr(window.CARDS).slice(0, Math.min(EXAM_N, window.CARDS.length));
+    exam = {
+      items: pool.map(function (c) {
+        var opts = shuffleArr(c.options.map(function (t, i) { return { text: t, correct: i === c.correctIndex }; }));
+        var ci = opts.findIndex(function (o) { return o.correct; });
+        return { card: c, opts: opts, correctIdx: ci };
+      }), pos: 0, answers: []
+    };
+    show("exam"); renderExamCard();
+  }
+  function renderExamCard() {
+    var it = exam.items[exam.pos];
+    $("exam-progress").textContent = (exam.pos + 1) + "/" + exam.items.length;
+    $("exam-bfill").style.width = (exam.pos / exam.items.length * 100) + "%";
+    var fig = $("exam-figure"), img = $("exam-img");
+    if (it.card.img) { img.src = "img/" + it.card.img; fig.hidden = false; } else { fig.hidden = true; }
+    $("exam-question").textContent = it.card.q;
+    var box = $("exam-options"); box.innerHTML = "";
+    it.opts.forEach(function (o, i) {
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "opt";
+      b.innerHTML = "<span class='ol'>" + "ABC".charAt(i) + "</span><span class='ot'></span>";
+      b.querySelector(".ot").textContent = o.text;
+      b.addEventListener("click", function () { examAnswer(i); });
+      box.appendChild(b);
+    });
+    $("exam-card").scrollTop = 0;
+  }
+  function examAnswer(i) {
+    if (!exam || exam.answers[exam.pos] != null) return;
+    exam.answers[exam.pos] = i;
+    AUDIO.flip();
+    exam.pos++;
+    if (exam.pos >= exam.items.length) endExam(); else renderExamCard();
+  }
+  function endExam() {
+    var correct = 0, total = exam.items.length;
+    exam.items.forEach(function (it, idx) { if (exam.answers[idx] === it.correctIdx) correct++; });
+    var pct = Math.round(correct / total * 100), pass = pct >= EXAM_PASS, need = Math.ceil(total * EXAM_PASS / 100);
+    $("exam-banner").textContent = pass ? "🐉 ¡APROBADO!" : "✗ No alcanzó";
+    $("exam-banner").style.color = pass ? "var(--good)" : "var(--bad)";
+    $("exam-score-sub").innerHTML = pass
+      ? "<b>" + pct + "%</b> — ¡" + esc(NAME) + ", estás listo para el dragón! 🔥"
+      : "<b>" + pct + "%</b> — necesitas " + need + "/" + total + " (90%). ¡Sigue afilando la hoja!";
+    $("exam-stats").innerHTML = sumstat("✅", correct, "ACIERTOS") + sumstat("❌", total - correct, "FALLOS") + sumstat("🎯", pct + "%", "NOTA");
+    var html = "", wrong = 0;
+    exam.items.forEach(function (it, idx) {
+      var ch = exam.answers[idx];
+      if (ch === it.correctIdx) return;
+      wrong++;
+      var your = ch == null ? "(sin responder)" : it.opts[ch].text;
+      html += "<div class='exrev'><div class='exrev-q'>" + esc(it.card.q) + "</div>" +
+        "<div class='exrev-bad'>✗ Tu respuesta: " + esc(your) + "</div>" +
+        "<div class='exrev-good'>✓ Correcta: " + esc(it.opts[it.correctIdx].text) + "</div>" +
+        (it.card.explanation ? "<div class='exrev-exp'>" + esc(it.card.explanation) + "</div>" : "") + "</div>";
+    });
+    $("exam-review").innerHTML = wrong ? html : "<div class='exrev'><div class='exrev-q'>🐉 ¡Perfecto! No fallaste ninguna.</div></div>";
+    show("examres");
+    if (pass) AUDIO.levelUp(); else AUDIO.wrongChime();
+  }
+
   // ============================================================ GUARDAR/CARGAR
   function exportSave() {
     var blob = new Blob([SRS.exportData()], { type: "application/json" });
@@ -358,6 +442,10 @@
     $("exitStudy").addEventListener("click", function () { renderMenu(); show("menu"); });
     $("summaryMenu").addEventListener("click", function () { renderMenu(); show("menu"); });
     $("summaryAgain").addEventListener("click", function () { startSession(sess ? sess.deck : "all"); });
+    $("examBtn").addEventListener("click", function () { gesture(); startExam(); });
+    $("exitExam").addEventListener("click", function () { if (confirm("¿Salir del examen? Se perderá este intento.")) { renderMenu(); show("menu"); } });
+    $("examRetry").addEventListener("click", function () { gesture(); startExam(); });
+    $("examMenu").addEventListener("click", function () { renderMenu(); show("menu"); });
     $("muteBtn").addEventListener("click", function () { gesture(); applyMute(!SRS.getSettings().muted); });
     $("exportBtn").addEventListener("click", exportSave);
     $("importBtn").addEventListener("click", function () { $("importFile").click(); });
@@ -380,6 +468,11 @@
           if (m === "mc") { if (e.key === " " || e.key === "Enter") { e.preventDefault(); advance(); } }
           else { if (k === "1") gradeRecall("again"); else if (k === "2") gradeRecall("ok"); else if (k === "3") gradeRecall("good"); }
         }
+      } else if (screens.exam.classList.contains("active")) {
+        var ke = e.key.toLowerCase();
+        if (ke === "1" || ke === "a") examAnswer(0);
+        else if (ke === "2" || ke === "b") examAnswer(1);
+        else if (ke === "3" || ke === "c") examAnswer(2);
       } else if (screens.menu.classList.contains("active")) {
         if (e.key === "Enter") { gesture(); startSession("all"); }
       }
