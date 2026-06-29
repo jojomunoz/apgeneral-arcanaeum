@@ -35,6 +35,7 @@
 }
 
 *{box-sizing:border-box; margin:0; padding:0}
+[hidden]{display:none !important}
 html,body{height:100%}
 body{
   font-family:var(--font-body);
@@ -243,7 +244,99 @@ main{position:relative; z-index:1; max-width:1000px; margin:0 auto; padding:clam
 }
 
 /* ===================== REDUCED MOTION ===================== */
+/* ============================================================
+   v2 — Norse extras: dragón, runas, Muro de Palabras, hero, modos
+   ============================================================ */
+:root{ --font-norse:'Grenze Gotisch','Cinzel',Georgia,serif; }
+.brand-name,.section-title,.ready-verdict,.summary-title,#lu-title,.ww-title{font-family:var(--font-norse)}
+
+/* dragón volando + pinos */
+.dragon{position:absolute; top:11%; left:0; width:min(260px,28vw); opacity:.5; z-index:-1;
+  animation:dragonFly 52s linear infinite}
+.dragon path{fill:#0b1322; stroke:rgba(127,223,255,.12); stroke-width:.5}
+@keyframes dragonFly{
+  0%{transform:translateX(-25vw) translateY(0) rotate(-2deg)}
+  50%{transform:translateX(60vw) translateY(-3vh) rotate(1deg)}
+  100%{transform:translateX(130vw) translateY(1vh) rotate(-1deg)}
+}
+.pines{position:absolute; bottom:0; left:0; width:100%; height:13vh}
+.pines path{fill:#060912}
+
+/* hint de música */
+.music-hint{position:fixed; top:62px; left:50%; transform:translateX(-50%); z-index:45;
+  font-family:var(--font-flavor); font-style:italic; color:var(--frost);
+  background:rgba(7,10,20,.85); border:1px solid var(--line); border-radius:20px;
+  padding:6px 16px; font-size:.84rem; box-shadow:0 4px 18px rgba(0,0,0,.5);
+  animation:hintPulse 2.2s ease-in-out infinite; transition:opacity .6s}
+.music-hint.gone{opacity:0; pointer-events:none}
+@keyframes hintPulse{50%{opacity:.55}}
+
+/* nombre del héroe en el HUD */
+.hero-chip{display:flex; align-items:center; gap:6px; padding:4px 10px; border:1px solid var(--line);
+  border-radius:20px; background:rgba(0,0,0,.3)}
+.hero-rune{color:var(--gold); font-size:1rem}
+.hero-name{font-family:var(--font-display); color:var(--ink); font-size:.85rem; letter-spacing:.04em;
+  max-width:100px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap}
+
+/* readiness en columna + word wall */
+.readiness{flex-direction:column; align-items:stretch; gap:16px}
+.ready-top{display:flex; gap:clamp(14px,3vw,28px); align-items:center}
+.wordwall-wrap{border-top:1px solid var(--line); padding-top:14px}
+.wordwall-head{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:10px; gap:10px}
+.ww-title{color:var(--gold); font-size:1.05rem; letter-spacing:.03em}
+.ww-count{font-family:var(--font-display); color:var(--frost); font-size:.82rem}
+.ww-count b{font-size:1.15rem}
+.wordwall{display:grid; grid-template-columns:repeat(12,1fr); gap:8px}
+.rune{aspect-ratio:1; display:grid; place-items:center; border-radius:10px;
+  border:1px solid rgba(212,175,55,.2); background:rgba(0,0,0,.3);
+  font-family:var(--font-display); font-weight:700; font-size:clamp(1rem,3.2vw,1.7rem); color:var(--gold);
+  opacity:calc(.26 + var(--glow,0)/100 * .74);
+  text-shadow:0 0 calc(var(--glow,0)/100 * 14px) rgba(212,175,55,.85);
+  transition:opacity .6s, text-shadow .6s, border-color .6s}
+.rune.lit{color:#fff; border-color:var(--gold); background:rgba(212,175,55,.16);
+  text-shadow:0 0 16px var(--gold),0 0 30px var(--amber); opacity:1; animation:runeGlow 2.8s ease-in-out infinite}
+@keyframes runeGlow{50%{text-shadow:0 0 24px var(--gold),0 0 46px var(--amber)}}
+.ww-hint{font-family:var(--font-flavor); font-style:italic; color:var(--muted); font-size:.82rem; margin-top:9px}
+
+/* iconos de mazo como runas */
+.deck-rune{font-family:var(--font-display); font-weight:700; font-size:1.9rem; color:var(--gold);
+  text-shadow:0 0 10px rgba(212,175,55,.45); filter:none; line-height:1}
+
+/* quick actions */
+.qa-left{display:flex; flex-direction:column; gap:6px; flex:1; min-width:240px}
+.qa-right{display:flex; flex-direction:column; gap:6px; align-items:flex-end}
+.qa-sub{font-family:var(--font-flavor); font-style:italic; color:var(--muted); font-size:.84rem; max-width:340px}
+.mode-desc{font-family:var(--font-flavor); font-style:italic; color:var(--muted); font-size:.8rem; max-width:300px; text-align:right}
+
+/* estudio: feedback, ayuda de notas, continuar */
+.grade-help{font-family:var(--font-display); text-align:center; color:var(--gold); font-size:.92rem; margin-bottom:10px}
+.grade small{display:block; font-family:var(--font-body); font-weight:400; font-size:.6rem; opacity:.78; margin-top:2px}
+.mc-feedback{font-family:var(--font-display); font-size:1.05rem; padding:10px 14px; border-radius:10px; margin-bottom:12px; text-align:center}
+.mc-feedback.ok{background:rgba(63,185,104,.18); color:#1f5d33; border:1px solid var(--good)}
+.mc-feedback.no{background:rgba(194,57,47,.14); color:#8a2820; border:1px solid var(--blood)}
+
+@media (max-width:560px){
+  .wordwall{grid-template-columns:repeat(6,1fr)}
+  .ready-top{flex-direction:column; text-align:center}
+  .qa-right{align-items:stretch}
+  .mode-desc,.qa-sub{text-align:center; max-width:none}
+  /* topbar compacto */
+  #topbar{padding:8px 10px}
+  .brand-name{font-size:.92rem; letter-spacing:.06em}
+  .hud{gap:7px}
+  .xpwrap{width:48px}
+  .xptext{display:none}
+  .hero-chip{padding:3px 7px; gap:4px}
+  .hero-name{max-width:58px; font-size:.74rem}
+  .lvl-num{font-size:1.05rem}
+  .icon-btn{width:36px; height:36px; font-size:1rem}
+  .music-hint{font-size:.76rem; top:56px; width:86%; text-align:center}
+}
+
+/* ============================================================
+   ACCESIBILIDAD: menos movimiento
+   ============================================================ */
 @media (prefers-reduced-motion:reduce){
-  .aurora,.flake,.levelup.go,.epic-btn{animation:none !important}
+  .aurora,.flake,.levelup.go,.epic-btn,.dragon,.rune.lit,.music-hint{animation:none !important}
   *{transition-duration:.01ms !important}
 }
