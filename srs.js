@@ -133,6 +133,31 @@ window.SRS = (function () {
     return { newToday: state.stats.newToday || 0, reviewToday: state.stats.reviewToday || 0 };
   }
 
+  // Plan adaptativo "listo para el examen": recalcula el trabajo diario necesario
+  // (toques = recuerdos correctos que faltan para dominar TODO) según los días restantes.
+  function remainingTouches() {
+    var n = 0;
+    for (var i = 0; i < window.CARDS.length; i++) {
+      var c = cs(window.CARDS[i].id);
+      var have = (c && c.lastGrade !== "again") ? (c.reps || 0) : 0;
+      n += Math.max(0, MASTER_REPS - have);
+    }
+    return n;
+  }
+  function daysToExam() { return Math.ceil((new Date(state.settings.examDate + "T23:59:59") - new Date()) / 86400000); }
+  function plan() {
+    var dleft = daysToExam();
+    var finishDays = Math.max(1, dleft - 1);              // margen de 1 día antes del examen
+    var rem = remainingTouches();
+    var required = rem > 0 ? Math.max(1, Math.ceil(rem / finishDays)) : 0;
+    var t = today(); var done = t.newToday + t.reviewToday;
+    var studyDays = Math.max(1, (state.stats.days || []).length);
+    var avg = Math.round(state.stats.reviews / studyDays);
+    var projDays = avg > 0 ? Math.ceil(rem / avg) : null; // a tu ritmo promedio, cuántos días faltan
+    var onPace = done >= required || (projDays !== null && projDays <= Math.max(1, dleft));
+    return { daysLeft: dleft, required: required, done: done, remaining: rem, avg: avg, projDays: projDays, onPace: onPace };
+  }
+
   function exportData() { return JSON.stringify(state, null, 1); }
   function importData(json) {
     var obj = JSON.parse(json);
@@ -153,7 +178,7 @@ window.SRS = (function () {
     getSettings: function () { return state.settings; },
     setSetting: function (k, v) { state.settings[k] = v; save(); },
     getStats: function () { return state.stats; },
-    today: today,
+    today: today, plan: plan, daysToExam: daysToExam,
     levelFor: levelFor, xpForLevel: xpForLevel
   };
 })();

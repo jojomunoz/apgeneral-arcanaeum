@@ -434,6 +434,8 @@ html{overflow-x:hidden}
 .sc-daily .sc-val b{color:var(--gold)}
 .daily-bar{height:8px; background:rgba(255,255,255,.08); border:1px solid var(--line); border-radius:20px; overflow:hidden; margin-top:4px}
 .daily-fill{height:100%; width:0%; border-radius:20px; background:linear-gradient(90deg,var(--gold-soft),var(--gold)); transition:width .5s}
+.pace-line{flex-basis:100%; font-family:var(--font-flavor); font-style:italic; color:var(--muted); font-size:.86rem; margin-top:4px}
+.pace-line b{color:var(--gold); font-style:normal}
 
 /* ============================================================
    ACCESIBILIDAD: menos movimiento

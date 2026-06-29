@@ -125,10 +125,17 @@
     else if (dleft === 0) cd.textContent = "¡es hoy! · " + fmtDate(exam);
     else cd.textContent = "ya pasó · " + fmtDate(exam);
     cd.classList.toggle("urgent", dleft <= 2);
-    var finishDays = Math.max(1, dleft - 1), quota = g.newCount > 0 ? Math.max(1, Math.ceil(g.newCount / finishDays)) : 0;
-    var doneNew = SRS.today().newToday;
-    if (g.newCount === 0) { $("daily-text").textContent = "✓ todo estudiado — ¡a dominar!"; $("daily-fill").style.width = "100%"; }
-    else { $("daily-text").innerHTML = "<b>" + doneNew + "</b> / " + quota + " nuevas"; $("daily-fill").style.width = Math.min(100, Math.round(doneNew / quota * 100)) + "%"; }
+    var pl = SRS.plan();
+    if (pl.remaining === 0) {
+      $("daily-text").textContent = "✓ ¡todo dominado!";
+      $("daily-fill").style.width = "100%";
+      $("pace-note").textContent = "🐉 Dominaste las " + g.total + " cartas. ¡Listo para el examen!";
+    } else {
+      $("daily-text").innerHTML = "<b>" + pl.done + "</b> / " + pl.required + " cartas";
+      $("daily-fill").style.width = Math.min(100, Math.round(pl.done / pl.required * 100)) + "%";
+      var badge = pl.done >= pl.required ? "✅ ¡meta de hoy cumplida!" : (pl.onPace ? "✅ vas al día" : "⚠️ subí el ritmo");
+      $("pace-note").innerHTML = "🏁 Necesitas ~<b>" + pl.required + "</b> cartas/día para dominar todo antes del " + fmtDate(exam) + " · " + badge;
+    }
 
     renderWordWall();
 
