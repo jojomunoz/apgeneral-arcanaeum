@@ -133,10 +133,15 @@
     $("stat-total").textContent = g.total;
     $("stat-due").textContent = g.due;
     $("stat-decksdone").textContent = g.decksDone;
-    $("due-badge").textContent = g.due;
-    $("review-sub").textContent = g.due > 0
-      ? "Tienes " + g.due + " carta(s) para repasar hoy (de todos los temas)."
-      : "Sin pendientes por hoy: te dará cartas nuevas para aprender.";
+    if (g.due > 0) {
+      $("review-label").textContent = "⚔️ REPASAR PENDIENTES";
+      $("due-badge").textContent = g.due; $("due-badge").hidden = false;
+      $("review-sub").textContent = "Tienes " + g.due + " carta(s) que toca repasar hoy (de todos los temas).";
+    } else {
+      $("review-label").textContent = "📖 APRENDER CARTAS NUEVAS";
+      $("due-badge").hidden = true;
+      $("review-sub").textContent = "No hay repasos pendientes hoy. Empieza con cartas nuevas; las que estudies volverán aquí cuando toque repasarlas.";
+    }
 
     // ---- Sprint: cuenta regresiva al examen + meta diaria ----
     var exam = SRS.getSettings().examDate, dleft = daysUntil(exam), cd = $("exam-countdown");
