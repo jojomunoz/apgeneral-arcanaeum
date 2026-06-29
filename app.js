@@ -390,13 +390,13 @@
   }
   function importSave(file) {
     var rd = new FileReader();
-    rd.onload = function () { try { SRS.importData(rd.result); renderMenu(); applyMute(SRS.getSettings().muted); toast("📥 ¡Partida cargada!"); } catch (e) { toast("⚠ Archivo inválido."); } };
+    rd.onload = function () { try { SRS.importData(rd.result); renderMenu(); applyMute(SRS.getSettings().muted, false); toast("📥 ¡Partida cargada!"); } catch (e) { toast("⚠ Archivo inválido."); } };
     rd.readAsText(file);
   }
 
   // ============================================================ MUTE
-  function applyMute(m) {
-    SRS.setSetting("muted", m);
+  function applyMute(m, persist) {
+    if (persist !== false) SRS.setSetting("muted", m);
     AUDIO.setMuted(m);
     var b = $("muteBtn"); b.textContent = m ? "🔇" : "🔊"; b.classList.toggle("muted", m);
     if (m) pauseMusic(); else if (firstGesture) startMusic();
@@ -426,8 +426,16 @@
     spawnSnow(36);
     spawnStars(64);
     initMusic();
-    applyMute(SRS.getSettings().muted);
+    applyMute(SRS.getSettings().muted, false);
     renderMenu();
+
+    // sincronización online (Firebase): baja lo último al abrir, sube en cada cambio
+    if (window.SYNC && window.SYNC.ok) {
+      window.ARCANAEUM_MENU_ACTIVE = function () { return screens.menu.classList.contains("active"); };
+      window.ARCANAEUM_RERENDER = function () { renderMenu(); };
+      SRS.setOnChange(function () { window.SYNC.schedule(); });
+      SYNC.pull(function () { renderMenu(); applyMute(SRS.getSettings().muted, false); SYNC.listen(); });
+    }
 
     ["pointerdown", "keydown", "touchstart"].forEach(function (ev) {
       document.addEventListener(ev, gesture, { once: true });

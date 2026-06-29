@@ -36,7 +36,12 @@ window.SRS = (function () {
     } catch (e) {}
     return fresh();
   }
-  function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} }
+  var onChange = null;
+  function save() {
+    state.updatedAt = Date.now();
+    try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {}
+    if (onChange) { try { onChange(); } catch (e) {} }
+  }
   function now() { return Date.now(); }
   function todayStr() { var d = new Date(); return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate(); }
   function cs(id) { return state.cards[id]; }
@@ -182,6 +187,7 @@ window.SRS = (function () {
     setSetting: function (k, v) { state.settings[k] = v; save(); },
     getStats: function () { return state.stats; },
     today: today, plan: plan, daysToExam: daysToExam,
+    setOnChange: function (fn) { onChange = fn; },
     levelFor: levelFor, xpForLevel: xpForLevel
   };
 })();
