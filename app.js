@@ -455,10 +455,6 @@
     $("examRetry").addEventListener("click", function () { gesture(); startExam(); });
     $("examMenu").addEventListener("click", function () { renderMenu(); show("menu"); });
     $("muteBtn").addEventListener("click", function () { gesture(); applyMute(!SRS.getSettings().muted); });
-    $("exportBtn").addEventListener("click", exportSave);
-    $("importBtn").addEventListener("click", function () { $("importFile").click(); });
-    $("importFile").addEventListener("change", function (e) { if (e.target.files[0]) importSave(e.target.files[0]); e.target.value = ""; });
-    $("resetBtn").addEventListener("click", function () { if (confirm("¿Borrar TODO el progreso? Esto no se puede deshacer (haz un respaldo primero).")) { SRS.reset(); renderMenu(); toast("Progreso reiniciado."); } });
 
     document.addEventListener("keydown", function (e) {
       if (screens.study.classList.contains("active")) {
