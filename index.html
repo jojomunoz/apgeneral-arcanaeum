@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#0a0e1a" />
+<title>Arcanaeum · A&P General — Skyrim Study</title>
+<meta name="description" content="Flashcards con repetición espaciada para el examen A&P General. Edición Skyrim. By the gods, ¡a estudiar!" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐉</text></svg>" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=EB+Garamond:ital@0;1&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- ===== FONDO NÓRDICO ===== -->
+<div id="bg" aria-hidden="true">
+  <div class="aurora"></div>
+  <div class="aurora aurora2"></div>
+  <svg class="mountains" viewBox="0 0 1440 320" preserveAspectRatio="none">
+    <path d="M0,320 L0,180 L160,90 L300,200 L440,70 L600,210 L760,40 L920,200 L1080,110 L1240,220 L1380,120 L1440,190 L1440,320 Z"/>
+  </svg>
+  <div id="snow"></div>
+  <div class="vignette"></div>
+</div>
+
+<!-- ===== OVERLAYS ===== -->
+<div id="levelup" class="levelup" aria-hidden="true"><div class="lu-inner"><span id="lu-title">HABILIDAD AUMENTADA</span><span id="lu-sub"></span></div></div>
+<div id="toast" class="toast" aria-live="polite"></div>
+
+<!-- ===== TOP BAR ===== -->
+<header id="topbar">
+  <div class="brand">
+    <span class="brand-rune">ᚠ</span>
+    <span class="brand-name">ARCANAEUM</span>
+    <span class="brand-sub">A&P General</span>
+  </div>
+  <div class="hud">
+    <div class="lvl"><span class="lvl-num" id="hud-level">1</span><span class="lvl-lbl">NIVEL</span></div>
+    <div class="xpwrap"><div class="xpbar"><div id="hud-xpfill" class="xpfill"></div></div><span id="hud-xptext" class="xptext">0 XP</span></div>
+    <div class="streak" id="hud-streak" title="Racha de días">🔥 <span id="hud-streak-num">0</span></div>
+    <button id="muteBtn" class="icon-btn" type="button" aria-label="Silenciar / activar sonido" title="Sonido">🔊</button>
+  </div>
+</header>
+
+<main>
+
+  <!-- ============================================================ -->
+  <!-- MENÚ -->
+  <!-- ============================================================ -->
+  <section id="screen-menu" class="screen active" aria-label="Menú">
+
+    <div class="readiness card-panel">
+      <div class="ready-gauge">
+        <div id="ready-ring" class="ready-ring"><span id="ready-pct">0%</span><span class="ready-lbl">preparación</span></div>
+      </div>
+      <div class="ready-info">
+        <h2 id="ready-verdict" class="ready-verdict">…</h2>
+        <p id="ready-detail" class="ready-detail">…</p>
+        <div class="ready-stats">
+          <span>🗂️ <b id="stat-mastered">0</b>/<span id="stat-total">0</span> dominadas</span>
+          <span>📅 <b id="stat-due">0</b> para repasar hoy</span>
+          <span>🐉 <b id="stat-decksdone">0</b>/12 temas dominados</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="quick-actions">
+      <button id="reviewAllBtn" class="epic-btn" type="button">⚔️ REPASAR PENDIENTES <span id="due-badge" class="badge">0</span></button>
+      <div class="mode-toggle" role="group" aria-label="Modo de tarjeta">
+        <span class="mt-label">Modo:</span>
+        <button id="modeMC" class="seg" type="button">Opciones</button>
+        <button id="modeRecall" class="seg" type="button">Recall puro</button>
+      </div>
+    </div>
+
+    <h3 class="section-title">📜 Tomos de Conocimiento</h3>
+    <div id="deck-grid" class="deck-grid"></div>
+
+    <div class="save-row card-panel">
+      <span class="save-text">Tu progreso se guarda solo en este navegador. Hacé respaldo del pergamino:</span>
+      <div class="save-btns">
+        <button id="exportBtn" class="ghost-btn" type="button">📜 Guardar partida</button>
+        <button id="importBtn" class="ghost-btn" type="button">📥 Cargar partida</button>
+        <button id="resetBtn" class="ghost-btn danger" type="button">🗑️ Reiniciar</button>
+      </div>
+    </div>
+    <input id="importFile" type="file" accept="application/json,.json" hidden />
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- ESTUDIO -->
+  <!-- ============================================================ -->
+  <section id="screen-study" class="screen" aria-label="Estudio">
+    <div class="study-top">
+      <button id="exitStudy" class="ghost-btn small" type="button">‹ Salir</button>
+      <span id="study-deck" class="study-deck">Tema</span>
+      <span id="study-progress" class="study-progress">0/0</span>
+    </div>
+    <div id="study-bar"><div id="study-fill"></div></div>
+
+    <div id="card" class="scroll-card">
+      <div class="card-tag" id="card-tag">NUEVA</div>
+      <figure id="card-figure" class="card-figure" hidden><img id="card-img" alt="Figura de referencia" /></figure>
+      <div id="card-question" class="card-question">…</div>
+      <div id="card-options" class="card-options"></div>
+      <div id="card-back" class="card-back" hidden>
+        <div class="back-answer" id="back-answer"></div>
+        <div class="back-expl-label">📖 Explicación</div>
+        <div class="back-expl" id="back-expl"></div>
+      </div>
+    </div>
+
+    <div id="study-actions" class="study-actions">
+      <button id="revealBtn" class="epic-btn wide" type="button">Mostrar respuesta <span class="kbd">espacio</span></button>
+      <div id="grade-buttons" class="grade-buttons" hidden>
+        <button class="grade again" data-grade="again" type="button">❄️ No lo sé<span class="kbd">1</span></button>
+        <button class="grade ok" data-grade="ok" type="button">⚡ Casi<span class="kbd">2</span></button>
+        <button class="grade good" data-grade="good" type="button">🔥 ¡Lo sé!<span class="kbd">3</span></button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <!-- RESUMEN -->
+  <!-- ============================================================ -->
+  <section id="screen-summary" class="screen" aria-label="Resumen">
+    <div class="summary-inner card-panel">
+      <h1 class="summary-title">⚔️ SESIÓN COMPLETADA</h1>
+      <p id="summary-flavor" class="summary-flavor">…</p>
+      <div id="summary-stats" class="summary-stats"></div>
+      <div id="summary-ready" class="summary-ready"></div>
+      <div class="summary-actions">
+        <button id="summaryMenu" class="epic-btn" type="button">🏔️ Volver al menú</button>
+        <button id="summaryAgain" class="ghost-btn" type="button">Seguir estudiando</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script src="data/cards.js"></script>
+<script src="srs.js"></script>
+<script src="audio.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
