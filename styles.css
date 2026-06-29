@@ -334,9 +334,88 @@ main{position:relative; z-index:1; max-width:1000px; margin:0 auto; padding:clam
 }
 
 /* ============================================================
+   v3 — runas con fuente real, cielo nórdico (lunas/estrellas/aurora),
+   dragón visible, Muro de piedras rúnicas
+   ============================================================ */
+.rune,.deck-rune,.hero-rune{font-family:'Noto Sans Runic','Segoe UI Historic','Cinzel',serif !important}
+
+/* estrellas */
+.stars{position:absolute; inset:0}
+.star{position:absolute; border-radius:50%; background:#fff; box-shadow:0 0 4px rgba(255,255,255,.6); animation:twinkle var(--tw,3s) ease-in-out infinite}
+@keyframes twinkle{0%,100%{opacity:.85}50%{opacity:.15}}
+
+/* dos lunas de Skyrim (Masser + Secunda) */
+.moon{position:absolute; border-radius:50%; z-index:-1}
+.moon-big{width:clamp(96px,11vw,168px); aspect-ratio:1; top:6%; right:8%;
+  background:radial-gradient(circle at 38% 34%, #f4ead0, #d8c69a 58%, #b29c6e 100%);
+  box-shadow:0 0 50px rgba(240,228,196,.32), inset -10px -10px 26px rgba(110,92,60,.55), inset 8px 8px 18px rgba(255,250,230,.3)}
+.moon-small{width:clamp(44px,5.5vw,76px); aspect-ratio:1; top:17%; right:23%;
+  background:radial-gradient(circle at 40% 35%, #ffffff, #d2e0ec 65%, #9fb4c6 100%);
+  box-shadow:0 0 30px rgba(205,224,240,.35), inset -6px -6px 14px rgba(95,118,142,.55)}
+
+/* aurora más viva */
+.aurora{opacity:.92}
+.aurora2{opacity:.55}
+.aurora3{position:absolute; top:-4%; left:-12%; width:124%; height:52%;
+  background:
+    radial-gradient(48% 60% at 38% 28%, rgba(57,255,150,.34), transparent 70%),
+    radial-gradient(46% 56% at 72% 18%, rgba(140,90,255,.28), transparent 70%);
+  filter:blur(46px); opacity:.6; mix-blend-mode:screen;
+  animation:auroraDrift 28s ease-in-out infinite alternate-reverse}
+
+/* dragón visible planeando en el cielo abierto (arriba a la derecha, junto a la luna) */
+.dragon{position:absolute; top:4%; right:1%; left:auto; width:min(330px,34vw); opacity:.92; z-index:-1;
+  filter:drop-shadow(0 0 14px rgba(120,180,225,.55)); animation:dragonGlide 16s ease-in-out infinite}
+.dragon path{fill:rgba(13,22,40,.95); stroke:rgba(150,230,255,.55); stroke-width:.9}
+@keyframes dragonGlide{
+  0%{transform:translate(0,0) rotate(-3deg)}
+  50%{transform:translate(-4vw,2.5vh) rotate(2deg)}
+  100%{transform:translate(0,0) rotate(-3deg)}
+}
+
+/* hint de música más visible */
+.music-hint{font-family:var(--font-display); font-style:normal; color:#1a1407;
+  background:linear-gradient(180deg,#e7c75a,var(--gold)); border:1px solid #8a6d18; color:#241a06;
+  box-shadow:0 4px 18px rgba(212,175,55,.4)}
+
+/* Muro de Palabras como piedras rúnicas talladas */
+.wordwall{display:grid; grid-template-columns:repeat(12,1fr); gap:8px}
+.rune{aspect-ratio:1; display:grid; place-items:center; border-radius:9px;
+  background:linear-gradient(160deg,#2b3142,#191e29);
+  border:1px solid rgba(255,255,255,.08);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.07), inset 0 -4px 8px rgba(0,0,0,.55), 0 2px 5px rgba(0,0,0,.4);
+  font-weight:700; font-size:clamp(1.1rem,3.4vw,1.85rem);
+  color:color-mix(in srgb, #59617a, #e8c25a calc(var(--glow,0)*1%));
+  text-shadow:0 1px 1px rgba(0,0,0,.6), 0 0 calc(var(--glow,0)/100 * 12px) rgba(212,175,55,.7);
+  transition:color .6s, box-shadow .6s, background .6s, border-color .6s}
+.rune.lit{color:#fff5dc; background:linear-gradient(160deg,#4d4220,#2e2710); border-color:var(--gold);
+  box-shadow:inset 0 0 14px rgba(212,175,55,.5), 0 0 18px rgba(212,175,55,.6); animation:runeGlow 2.8s ease-in-out infinite}
+@keyframes runeGlow{50%{box-shadow:inset 0 0 18px rgba(212,175,55,.75), 0 0 30px rgba(255,180,60,.85)}}
+
+/* iconos de mazo como runas talladas en oro */
+.deck-rune{font-weight:700; font-size:1.95rem; color:var(--gold); text-shadow:0 0 12px rgba(212,175,55,.5); line-height:1}
+
+@media (max-width:560px){
+  .moon-big{width:78px; top:3%; left:5%; right:auto}
+  .moon-small{width:40px; top:11%; left:20%; right:auto}
+  .dragon{width:58vw; top:4%; right:0}
+}
+
+/* runas dibujadas como SVG (sin dependencia de fuente) */
+.rune-svg{display:block}
+.rune .rune-svg{width:56%; height:56%; filter:drop-shadow(0 0 calc(var(--glow,0)/100 * 7px) rgba(212,175,55,.85))}
+.rune.lit .rune-svg{filter:drop-shadow(0 0 9px rgba(255,185,70,.95))}
+.deck-rune{display:flex; align-items:center; height:38px}
+.deck-rune .rune-svg{width:30px; height:38px; color:var(--gold)}
+.hero-rune{display:inline-flex; align-items:center; color:var(--gold)}
+.hero-rune svg{width:13px; height:17px; display:block}
+
+html{overflow-x:hidden}
+
+/* ============================================================
    ACCESIBILIDAD: menos movimiento
    ============================================================ */
 @media (prefers-reduced-motion:reduce){
-  .aurora,.flake,.levelup.go,.epic-btn,.dragon,.rune.lit,.music-hint{animation:none !important}
+  .aurora,.aurora3,.flake,.star,.levelup.go,.epic-btn,.dragon,.rune.lit,.music-hint{animation:none !important}
   *{transition-duration:.01ms !important}
 }

@@ -9,17 +9,21 @@
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐉</text></svg>" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Grenze+Gotisch:wght@500;700;900&family=EB+Garamond:ital@0;1&display=swap" rel="stylesheet" />
-<link rel="stylesheet" href="styles.css" />
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Grenze+Gotisch:wght@500;700;900&family=EB+Garamond:ital@0;1&family=Noto+Sans+Runic&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css?v=3" />
 </head>
 <body>
 
 <!-- ===== FONDO NÓRDICO ===== -->
 <div id="bg" aria-hidden="true">
+  <div class="stars" id="stars"></div>
+  <div class="moon moon-big"></div>
+  <div class="moon moon-small"></div>
   <div class="aurora"></div>
   <div class="aurora aurora2"></div>
-  <svg class="dragon" viewBox="0 0 120 60" preserveAspectRatio="xMidYMid meet">
-    <path d="M2 40 C20 36 30 38 42 34 L52 22 C54 30 58 32 64 31 C72 30 80 18 96 14 C86 22 84 28 86 32 C96 30 110 26 118 18 C112 30 100 36 90 36 C84 40 76 42 70 40 L60 50 C58 42 54 40 48 41 C36 43 18 46 2 40 Z"/>
+  <div class="aurora aurora3"></div>
+  <svg class="dragon" viewBox="0 0 220 92" preserveAspectRatio="xMidYMid meet">
+    <path d="M10 60 C36 54 52 56 70 51 L64 30 C74 42 86 47 100 46 L94 22 C104 36 118 43 136 43 C150 31 162 20 188 13 C176 27 174 38 181 46 C200 42 214 35 220 28 C210 44 188 54 166 55 C176 61 192 62 206 59 C186 70 160 70 140 62 C130 70 116 72 104 67 L110 84 L96 64 C88 66 78 66 70 62 L74 78 L62 60 C44 63 28 65 10 60 Z"/>
   </svg>
   <svg class="mountains" viewBox="0 0 1440 320" preserveAspectRatio="none">
     <path d="M0,320 L0,180 L160,90 L300,200 L440,70 L600,210 L760,40 L920,200 L1080,110 L1240,220 L1380,120 L1440,190 L1440,320 Z"/>
@@ -54,7 +58,7 @@
     <span class="brand-sub">A&P General</span>
   </div>
   <div class="hud">
-    <div class="hero-chip" title="Sangre de Dragón"><span class="hero-rune">ᛞ</span><span class="hero-name" id="hero-name">Abdiel</span></div>
+    <div class="hero-chip" title="Sangre de Dragón"><span class="hero-rune"><svg viewBox="0 0 24 32" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 V29 M12 3 L6 10 M12 3 L18 10"/></svg></span><span class="hero-name" id="hero-name">Abdiel</span></div>
     <div class="lvl"><span class="lvl-num" id="hud-level">1</span><span class="lvl-lbl">NIVEL</span></div>
     <div class="xpwrap"><div class="xpbar"><div id="hud-xpfill" class="xpfill"></div></div><span id="hud-xptext" class="xptext">0 XP</span></div>
     <div class="streak" id="hud-streak" title="Racha de días">🔥 <span id="hud-streak-num">0</span></div>
@@ -177,9 +181,9 @@
 
 </main>
 
-<script src="data/cards.js"></script>
-<script src="srs.js"></script>
-<script src="audio.js"></script>
-<script src="app.js"></script>
+<script src="data/cards.js?v=3"></script>
+<script src="srs.js?v=3"></script>
+<script src="audio.js?v=3"></script>
+<script src="app.js?v=3"></script>
 </body>
 </html>

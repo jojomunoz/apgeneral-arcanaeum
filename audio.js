@@ -93,15 +93,15 @@ window.AUDIO = (function () {
     var t = ctx.currentTime + 0.08;
     var ch = PROG[amb.step % PROG.length];
     // drone + pad
-    pad(NF[ch.bass] / 2, t, BAR, 0.05);                       // sub-bajo
-    ch.pad.forEach(function (nn) { pad(NF[nn], t, BAR, 0.045); });
+    pad(NF[ch.bass] / 2, t, BAR, 0.09);                       // sub-bajo
+    ch.pad.forEach(function (nn) { pad(NF[nn], t, BAR, 0.07); });
     // melodía: 2-3 notas con silencios y leve variación
     var nNotes = 2 + (Math.random() < 0.5 ? 1 : 0);
     for (var i = 0; i < nNotes; i++) {
       if (Math.random() < 0.25) continue; // silencios
       var f = NF[MEL[Math.floor(Math.random() * MEL.length)]];
       var off = 0.3 + i * (BAR / (nNotes + 0.5)) + Math.random() * 0.3;
-      mel(f, t + off, 1.6 + Math.random() * 0.8, 0.05);
+      mel(f, t + off, 1.6 + Math.random() * 0.8, 0.14);
     }
     // viento sutil
     if (amb.step % 2 === 0) noise(t, BAR, 0.012, 700, 200);
@@ -110,14 +110,14 @@ window.AUDIO = (function () {
   }
 
   var API = {
-    setMuted: function (m) { muted = !!m; if (ambGain && ctx) ambGain.gain.setTargetAtTime(muted ? 0 : 0.16, ctx.currentTime, 0.4); },
+    setMuted: function (m) { muted = !!m; if (ambGain && ctx) ambGain.gain.setTargetAtTime(muted ? 0 : 0.85, ctx.currentTime, 0.4); },
     isMuted: function () { return muted; },
     unlock: function () { ensure(); ready(); },
 
     startAmbient: function () {
       if (!ready()) return;
       if (!amb.playing) { amb.playing = true; amb.step = 0; scheduleBar(); }
-      ambGain.gain.setTargetAtTime(muted ? 0 : 0.16, ctx.currentTime, 1.5);
+      ambGain.gain.setTargetAtTime(muted ? 0 : 0.85, ctx.currentTime, 1.5);
     },
     stopAmbient: function () { amb.playing = false; if (amb.timer) clearTimeout(amb.timer); if (ambGain && ctx) ambGain.gain.setTargetAtTime(0, ctx.currentTime, 0.5); },
 

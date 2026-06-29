@@ -10,8 +10,25 @@
   var NAME = "Abdiel";
   try { var pn = new URLSearchParams(location.search).get("name"); if (pn && pn.trim()) NAME = pn.trim().slice(0, 20); } catch (e) {}
 
-  // runas (Futhark antiguo) por tema — usadas en iconos de mazo y Muro de Palabras
-  var RUNES = { "01": "ᚠ", "02": "ᚢ", "03": "ᚦ", "04": "ᚨ", "05": "ᚱ", "06": "ᚲ", "07": "ᚷ", "08": "ᚺ", "09": "ᛁ", "10": "ᛃ", "11": "ᛟ", "12": "ᛏ" };
+  // runas (Futhark antiguo) dibujadas como SVG (no dependen de ninguna fuente)
+  var RUNE_PATHS = {
+    "01": "M8 3 V29 M8 8 L18 4 M8 15 L18 11",          // Fehu
+    "02": "M7 29 V6 L17 11 V29",                       // Uruz
+    "03": "M9 3 V29 M9 10 L17 14.5 L9 19",             // Thurisaz
+    "04": "M9 3 V29 M9 7 L18 12 M9 13 L18 18",         // Ansuz
+    "05": "M9 3 V29 M9 3 C19 3 19 16 9 16 M10 16 L18 29", // Raidho
+    "06": "M17 5 L8 16 L17 27",                        // Kenaz
+    "07": "M6 5 L18 27 M18 5 L6 27",                   // Gebo
+    "08": "M7 4 V28 M17 4 V28 M7 13 L17 19",           // Hagalaz
+    "09": "M12 3 V29",                                 // Isa
+    "10": "M8 5 L13 10 L8 15 M16 17 L11 22 L16 27",    // Jera
+    "11": "M12 3 L18 11 L12 19 L6 11 Z M9 17 L6 29 M15 17 L18 29", // Othala
+    "12": "M12 3 V29 M12 3 L6 10 M12 3 L18 10"         // Tiwaz
+  };
+  function runeSvg(code) {
+    var d = RUNE_PATHS[code] || RUNE_PATHS["09"];
+    return "<svg class='rune-svg' viewBox='0 0 24 32' fill='none' stroke='currentColor' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'><path d='" + d + "'/></svg>";
+  }
 
   // estado de sesión
   var queue = [], pos = 0, currentId = null, revealed = false, chosen = null;
@@ -60,7 +77,7 @@
       el.className = "rune" + (lit ? " lit" : "");
       el.style.setProperty("--glow", s.pct);
       el.title = dk.nameEs + " — " + s.pct + "%";
-      el.textContent = RUNES[dk.code] || "ᛞ";
+      el.innerHTML = runeSvg(dk.code);
       ww.appendChild(el);
     });
     $("wordwall-count").textContent = done;
@@ -102,7 +119,7 @@
       var el = document.createElement("button");
       el.type = "button"; el.className = "deck";
       el.innerHTML =
-        "<div class='deck-rune'>" + (RUNES[dk.code] || "ᛞ") + "</div>" +
+        "<div class='deck-rune'>" + runeSvg(dk.code) + "</div>" +
         "<div class='deck-name'>" + esc(dk.nameEs) + "</div>" +
         "<div class='deck-en'>" + esc(dk.nameEn) + "</div>" +
         "<div class='deck-bar'><div class='deck-fill' style='width:" + s.pct + "%'></div></div>" +
@@ -119,7 +136,7 @@
     if (!queue.length) { toast("No hay cartas en este tomo."); return; }
     pos = 0; sess = { reviewed: 0, again: 0, ok: 0, good: 0, xp: 0, levelups: 0, mastered: 0, deck: deckNum };
     var dk = deckNum === "all" ? null : deckById(deckNum);
-    $("study-deck").textContent = dk ? ((RUNES[dk.code] || "") + " " + dk.nameEs) : "⚔️ Repaso general";
+    $("study-deck").textContent = dk ? dk.nameEs : "⚔️ Repaso general";
     show("study"); renderCard();
   }
 
@@ -283,12 +300,25 @@
     s.innerHTML = html;
   }
 
+  function spawnStars(n) {
+    var s = $("stars"); if (!s) return; var html = "";
+    for (var i = 0; i < n; i++) {
+      var left = (Math.random() * 100).toFixed(2), top = (Math.random() * 55).toFixed(2),
+        sz = (1 + Math.random() * 1.7).toFixed(1), tw = (2 + Math.random() * 4).toFixed(1), d = (-Math.random() * 4).toFixed(1);
+      html += "<span class='star' style='left:" + left + "vw;top:" + top + "vh;width:" + sz + "px;height:" + sz + "px;--tw:" + tw + "s;animation-delay:" + d + "s'></span>";
+    }
+    s.innerHTML = html;
+  }
+
   function init() {
     spawnSnow(36);
+    spawnStars(64);
     applyMute(SRS.getSettings().muted);
     renderMenu();
 
-    document.addEventListener("pointerdown", gesture, { once: true });
+    ["pointerdown", "keydown", "touchstart"].forEach(function (ev) {
+      document.addEventListener(ev, gesture, { once: true });
+    });
 
     $("reviewAllBtn").addEventListener("click", function () { gesture(); startSession("all"); });
     $("modeMC").addEventListener("click", function () { SRS.setSetting("mode", "mc"); updateModeDesc(); });
