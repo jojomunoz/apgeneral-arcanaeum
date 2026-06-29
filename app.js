@@ -428,6 +428,7 @@
     initMusic();
     applyMute(SRS.getSettings().muted, false);
     renderMenu();
+    showMotd();   // saludo motivacional al abrir
 
     // sincronización online (Firebase): baja lo último al abrir, sube en cada cambio
     if (window.SYNC && window.SYNC.ok) {
