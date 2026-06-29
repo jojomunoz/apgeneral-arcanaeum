@@ -77,6 +77,7 @@ window.SRS = (function () {
       c.reps++; c.intervalDays = c.reps < 2 ? 0.6 : 1; c.due = now() + c.intervalDays * DAY; xp = 10; // ~mañana
     }
     c.lastGrade = rating;
+    c.ts = now();                 // marca de tiempo del último repaso (para fusionar entre dispositivos)
     state.cards[id] = c;
     // conteo del día (para la meta diaria)
     var t = todayStr();
