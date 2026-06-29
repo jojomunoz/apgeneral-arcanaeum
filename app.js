@@ -40,11 +40,16 @@
   function deckById(num) { for (var i = 0; i < window.DECKS.length; i++) if (window.DECKS[i].num === num) return window.DECKS[i]; return null; }
   function mode() { return SRS.getSettings().mode; }
 
+  // ---- música: archivo local (mix ambiental medieval, sin copyright) ----
+  var music = null;
+  function initMusic() { music = $("music"); if (music) { music.volume = 0.5; music.loop = true; } }
+  function startMusic() { if (music && !SRS.getSettings().muted) { var pr = music.play(); if (pr && pr.catch) pr.catch(function () {}); } }
+  function pauseMusic() { if (music) music.pause(); }
+
   function gesture() {
     if (firstGesture) return; firstGesture = true;
     AUDIO.unlock();
-    if (!SRS.getSettings().muted) AUDIO.startAmbient();
-    var h = $("music-hint"); if (h) h.classList.add("gone");
+    startMusic();
   }
 
   // ============================================================ MENÚ
@@ -287,7 +292,7 @@
     SRS.setSetting("muted", m);
     AUDIO.setMuted(m);
     var b = $("muteBtn"); b.textContent = m ? "🔇" : "🔊"; b.classList.toggle("muted", m);
-    if (!m && firstGesture) AUDIO.startAmbient();
+    if (m) pauseMusic(); else if (firstGesture) startMusic();
   }
 
   // ============================================================ INIT
@@ -313,6 +318,7 @@
   function init() {
     spawnSnow(36);
     spawnStars(64);
+    initMusic();
     applyMute(SRS.getSettings().muted);
     renderMenu();
 
